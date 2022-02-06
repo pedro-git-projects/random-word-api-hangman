@@ -7,8 +7,28 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"strings"
 	"time"
 )
+
+func printState(RandomWord string, Guesses map[rune]bool) {
+	for _, ch := range RandomWord {
+		if Guesses[ch] == true {
+			fmt.Printf("%c", ch)
+		} else {
+			fmt.Print("_")
+		}
+	}
+	fmt.Println(" ")
+}
+
+func printHangman(hangmanState int) string {
+	data, err := ioutil.ReadFile(fmt.Sprintf("states/hangman%d.txt", hangmanState))
+	if err != nil {
+		panic(err)
+	}
+	return string(data)
+}
 
 func main() {
 
@@ -34,7 +54,21 @@ func main() {
 	_ = json.Unmarshal([]byte(body), &words)
 	log.Printf("Unmarshalled: %v", words)
 
-	// choosing a random word from the array
-	log.Printf(words[randomIndex])
+	// choosing a random word from the array and storing all as lowercase
+	randomWord := words[randomIndex]
+	randomWord = strings.ToLower(randomWord)
+	log.Printf(randomWord)
 
+	// guessed letters
+	guessedLetters := map[rune]bool{}
+	// first letter
+	guessedLetters[rune(randomWord[0])] = true
+	// last letter
+	guessedLetters[rune(randomWord[len(randomWord)-1])] = true
+
+	// hangmanState := 0
+
+	printState(randomWord, guessedLetters)
+
+	fmt.Println(printHangman(5))
 }
